@@ -4,12 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UTARO | Official Website</title>
-    <meta name="description" content="DJ UTARO公式サイト。日本から世界へ挑戦するDJ。最新の音楽、出演情報はこちら。">
-    <meta name="keywords" content="DJ UTARO, UTARO, DJ, 日本, TOKYO, クラブ, 音楽">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <meta name="description" content="DJ UTARO Official Website. 日本から世界へ。Progressive House, Electro, Future Bassをクロスオーバーさせる次世代DJ。最新のリリース情報、出演スケジュール、コンタクトはこちら。">
+    <meta name="keywords" content="DJ UTARO, UTARO, DJ, 日本, TOKYO, Club, EDM, House, Music, BE MORE HUMAN">
+    <meta property="og:title" content="UTARO | Official Website">
+    <meta property="og:description" content="DJ UTARO Official Website. FROM JAPAN TO THE WORLD.">
+    <meta property="og:image" content="https://utaro-official.vercel.app/image_1.jpg">
+    <meta property="og:url" content="https://utaro-official.vercel.app">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+
     <style>
         /* --- 基本設定 --- */
         :root {
@@ -343,13 +351,11 @@
 
         footer { padding: 80px 40px; text-align: center; background: #050505; color: #888; }
         
-        /* SNSリンクを確実に表示させる修正 */
         .social-links { 
             display: flex; 
             justify-content: center; 
             gap: 40px; 
             margin-bottom: 40px;
-            /* AOSアニメーション削除により常時表示 */
         }
         .social-btn { 
             color: #fff; 
@@ -507,9 +513,9 @@
 
     <section id="booking">
         <h2 class="section-title" data-aos="fade-up">Booking & Contact</h2>
-        <form class="contact-form" action="https://formsubmit.co/uta.hatakeyama6419@gmail.com" method="POST" data-aos="fade-up" data-aos-delay="400">
-            <input type="hidden" name="_next" value="https://utaro-official.vercel.app/">
+        <form id="contactForm" class="contact-form" data-aos="fade-up" data-aos-delay="400">
             <input type="hidden" name="_captcha" value="false">
+            <input type="hidden" name="_template" value="table">
             
             <input type="text" name="name" placeholder="Your Name / Company" required>
             <input type="email" name="email" placeholder="Your Email Address" required>
@@ -520,7 +526,13 @@
                 <option>Other</option>
             </select>
             <textarea name="message" rows="6" placeholder="Message Details" required></textarea>
+            
             <button type="submit" class="submit-btn">SEND</button>
+            
+            <div id="formMessage" style="display: none; margin-top: 20px; color: var(--primary-color); font-weight: 700; font-size: 1.1rem; line-height: 1.5;">
+                Thank you for contacting us.<br>
+                Your message has been sent successfully.
+            </div>
         </form>
     </section>
 
@@ -540,6 +552,57 @@
             if (window.scrollY > 50) nav.classList.add('scrolled');
             else nav.classList.remove('scrolled');
         });
+
+        /* --- メール送信の制御システム --- */
+        const contactForm = document.getElementById('contactForm');
+        const formMessage = document.getElementById('formMessage');
+
+        if (contactForm) {
+            contactForm.addEventListener('submit', function(e) {
+                e.preventDefault(); // 画面遷移を止める
+                
+                const btn = contactForm.querySelector('.submit-btn');
+                const originalText = btn.innerText;
+
+                // ボタンを送信中モードにする
+                btn.innerText = 'SENDING...';
+                btn.disabled = true;
+                btn.style.opacity = '0.7';
+
+                // FormSubmitへデータを送る
+                const formData = new FormData(contactForm);
+                
+                // Ajax送信
+                fetch("https://formsubmit.co/ajax/uta.hatakeyama6419@gmail.com", {
+                    method: "POST",
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // 送信成功！
+                    contactForm.reset(); // フォームの中身を消す
+                    formMessage.style.display = 'block'; // 御礼メッセージを表示
+                    btn.innerText = 'SENT!'; // ボタンの文字を変える
+                    
+                    // 5秒後にボタンを元に戻す
+                    setTimeout(() => {
+                        btn.innerText = originalText;
+                        btn.disabled = false;
+                        btn.style.opacity = '1';
+                        formMessage.style.display = 'none'; // メッセージを消す
+                    }, 5000);
+                })
+                .catch(error => {
+                    // 送信失敗
+                    console.error('Error:', error);
+                    btn.innerText = 'ERROR';
+                    alert('送信に失敗しました。時間をおいて再度お試しください。');
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                    btn.innerText = originalText;
+                });
+            });
+        }
     </script>
 </body>
 </html>
